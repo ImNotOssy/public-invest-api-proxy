@@ -17,7 +17,15 @@ def login_required(func):
 
 
 class Public:
-    def __init__(self, filename=None, path=None):
+    def __init__(self, filename=None, path=None, proxies=None):
+        """
+        Initialize Public class with optional session persistence and proxy settings.
+        
+        Args:
+            filename (str): Filename to store session cookies.
+            path (str): Path to store session cookies.
+            proxies (dict): Optional dictionary containing proxy settings.
+        """
         self.session = requests.Session()
         self.endpoints = Endpoints()
         self.session.headers.update(self.endpoints.build_headers())
@@ -32,7 +40,16 @@ class Public:
         self.path = None
         if path is not None:
             self.path = path
+        if proxies is not None:
+            self.session.proxies.update(proxies)  # Add proxy settings to the session
         self._load_cookies()
+
+    def check_proxy(self):
+        url = 'https://httpbin.org/ip'
+        print(f"Checking current IP using proxy: {self.session.proxies.update}")
+        response = self.session.get(url)
+        print(f"Response from httpbin: {response.json()}")
+        return response.json()
 
     def _save_cookies(self):
         filename = self.filename
